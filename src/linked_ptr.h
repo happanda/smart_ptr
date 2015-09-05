@@ -1,5 +1,6 @@
 #ifndef SMART_POINTERS_LINKED_PTR_H
 #define SMART_POINTERS_LINKED_PTR_H
+#include <memory>
 
 
 struct list_node
@@ -14,7 +15,7 @@ struct list_node
     void unlink();
     bool unique() const;
 
-    void swap(list_node& other);
+    void swap(list_node& rhs);
 
 private:
     //links to next and previous ptrs in list
@@ -33,14 +34,17 @@ private:
 
 public:
     linked_ptr();
-    linked_ptr(linked_ptr<T> const& other);
-    linked_ptr<T> const& operator=(linked_ptr<T> const& other);
+    linked_ptr(linked_ptr<T> const& rhs);
+    linked_ptr<T> const& operator=(linked_ptr<T> const& rhs);
     ~linked_ptr();
 
     template<class S> linked_ptr(S* data);
-    template<class S> linked_ptr(linked_ptr<S> const& other);
-    template<class S> linked_ptr<T> const& operator=(linked_ptr<S> const& other);
+    template<class S> linked_ptr(linked_ptr<S> const& rhs);
+    template<class S> linked_ptr<T> const& operator=(linked_ptr<S> const& rhs);
     template<class S, class D> linked_ptr(S* data, D deleter);
+
+    template<class S> linked_ptr(std::auto_ptr<S>&& rhs);
+    template<class S> linked_ptr(std::unique_ptr<S>&& rhs);
 
     void reset();
     void reset(T* data);
@@ -57,7 +61,7 @@ public:
 
     operator bool_type() const;
 
-    void swap(linked_ptr<T>& other);
+    void swap(linked_ptr<T>& rhs);
 
 private:
     T* mData{ nullptr };

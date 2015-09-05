@@ -8,17 +8,17 @@ using std::endl;
 class Linked_Ptr_General_Tests : public ::testing::Test
 {
 protected:
-    static char const* WRONG_DATA;
-    static char const* ERROR_COPY;
-    static char const* ERROR_ASSIGN;
-    static char const* ERROR_UNIQUE;
-    static char const* ERROR_NOT_UNIQUE;
-    static char const* ERROR_FUNC;
-    static char const* ERROR_EQUALITY;
-    static char const* ERROR_INEQUALITY;
-    static char const* ERROR_LESS;
-    static char const* ERROR_FOUND;
-    static char const* ERROR_NOT_FOUND;
+    static std::string const WRONG_DATA;
+    static std::string const ERROR_COPY;
+    static std::string const ERROR_ASSIGN;
+    static std::string const ERROR_UNIQUE;
+    static std::string const ERROR_NOT_UNIQUE;
+    static std::string const ERROR_FUNC;
+    static std::string const ERROR_EQUALITY;
+    static std::string const ERROR_INEQUALITY;
+    static std::string const ERROR_LESS;
+    static std::string const ERROR_FOUND;
+    static std::string const ERROR_NOT_FOUND;
 protected:
     int const MAX_ITERATIONS;
     char const* hello;
@@ -51,17 +51,17 @@ public:
     }
 };
 
-char const* Linked_Ptr_General_Tests::WRONG_DATA = "Wrong data pointed!!\n";
-char const* Linked_Ptr_General_Tests::ERROR_COPY = "Error copying pointer!!\n";
-char const* Linked_Ptr_General_Tests::ERROR_ASSIGN = "Error assigning pointer!!\n";
-char const* Linked_Ptr_General_Tests::ERROR_UNIQUE = "Error: pointer is unique!!\n";
-char const* Linked_Ptr_General_Tests::ERROR_NOT_UNIQUE = "Error: pointer is NOT unique!!\n";
-char const* Linked_Ptr_General_Tests::ERROR_FUNC = "Error in fucntion!!\n";
-char const* Linked_Ptr_General_Tests::ERROR_EQUALITY = "Error with equality!!\n";
-char const* Linked_Ptr_General_Tests::ERROR_INEQUALITY = "Error with INequality!!\n";
-char const* Linked_Ptr_General_Tests::ERROR_LESS = "Error with less operator!!\n";
-char const* Linked_Ptr_General_Tests::ERROR_FOUND = "Error: pointer found!!\n";
-char const* Linked_Ptr_General_Tests::ERROR_NOT_FOUND = "Error: pointer NOT found!!\n";
+std::string const Linked_Ptr_General_Tests::WRONG_DATA{ "Wrong data pointed!!\n" };
+std::string const Linked_Ptr_General_Tests::ERROR_COPY{ "Error copying pointer!!\n" };
+std::string const Linked_Ptr_General_Tests::ERROR_ASSIGN{ "Error assigning pointer!!\n" };
+std::string const Linked_Ptr_General_Tests::ERROR_UNIQUE{ "Error: pointer is unique!!\n" };
+std::string const Linked_Ptr_General_Tests::ERROR_NOT_UNIQUE{ "Error: pointer is NOT unique!!\n" };
+std::string const Linked_Ptr_General_Tests::ERROR_FUNC{ "Error in fucntion!!\n" };
+std::string const Linked_Ptr_General_Tests::ERROR_EQUALITY{ "Error with equality!!\n" };
+std::string const Linked_Ptr_General_Tests::ERROR_INEQUALITY{ "Error with INequality!!\n" };
+std::string const Linked_Ptr_General_Tests::ERROR_LESS{ "Error with less operator!!\n" };
+std::string const Linked_Ptr_General_Tests::ERROR_FOUND{ "Error: pointer found!!\n" };
+std::string const Linked_Ptr_General_Tests::ERROR_NOT_FOUND{ "Error: pointer NOT found!!\n" };
 
 TEST_F(Linked_Ptr_General_Tests, Swapping)
 {
@@ -170,7 +170,7 @@ TEST_F(Linked_Ptr_General_Tests, Reset)
 
     cout << "Reset 2nd pointer" << endl;
     p_to_copy1.reset();
-    EXPECT_EQ(NULL, p_to_copy1.get()) << "Pointer not NULL after reset!!" << endl;
+    EXPECT_EQ(nullptr, p_to_copy1.get()) << "Pointer not nullptr after reset!!" << endl;
     EXPECT_TRUE(p_to.unique()) << ERROR_NOT_UNIQUE;
     EXPECT_TRUE(p_to_copy1.unique()) << ERROR_NOT_UNIQUE;
 
@@ -201,10 +201,10 @@ TEST_F(Linked_Ptr_General_Tests, Logical_operators)
     EXPECT_FALSE(!(p_to < q_to) && !(q_to < p_to)) << ERROR_LESS;
 
     cout << "Test conversion to bool" << endl;
-    EXPECT_TRUE((bool)p_to) << "Coversion to bool gave False while pointer's not null" << endl;
+    EXPECT_TRUE((bool)p_to) << "Coversion to bool gave False while pointer's not nullptr" << endl;
     cout << "Reset pointer" << endl;
     p_to.reset();
-    EXPECT_FALSE(p_to) << "Coversion to bool gave True while pointer is null" << endl;
+    EXPECT_FALSE(p_to) << "Coversion to bool gave True while pointer is nullptr" << endl;
     cout << "Logical operators successful" << endl;
 }
 
@@ -308,4 +308,31 @@ TEST_F(Linked_Ptr_General_Tests, STLassociativeContainers)
     EXPECT_TRUE(sp.empty()) << "Set isn't empty when it must be!!" << endl;
 
     cout << "STLassociativeContainers successful" << endl;
+}
+
+TEST_F(Linked_Ptr_General_Tests, FromStandard)
+{
+    cout << "TEST construction from standard smart pointers" << endl;
+
+    {
+        cout << "Construct from auto_ptr" << endl;
+        std::auto_ptr<TestObject> autoObj(new TestObject(hello));
+        TestObject* to = autoObj.get();
+        linked_ptr<TestObject> linkedObj(std::move(autoObj));
+
+        EXPECT_EQ(nullptr, autoObj.get()) << ERROR_EQUALITY;
+        EXPECT_EQ(to, linkedObj.get()) << ERROR_EQUALITY;
+    }
+
+    {
+        cout << "Construct from unique_ptr" << endl;
+        std::unique_ptr<TestObject> uniObj(new TestObject(hello));
+        TestObject* to = uniObj.get();
+        linked_ptr<TestObject> linkedObj(std::move(uniObj));
+
+        EXPECT_EQ(nullptr, uniObj.get()) << ERROR_EQUALITY;
+        EXPECT_EQ(to, linkedObj.get()) << ERROR_EQUALITY;
+    }
+
+    cout << "Construction from standard smart pointers successful" << endl;
 }

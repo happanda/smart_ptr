@@ -155,6 +155,20 @@ linked_ptr<T>::linked_ptr(S* data, D deleter)
 }
 
 template<class T>
+template<class S>
+linked_ptr<T>::linked_ptr(std::auto_ptr<S>&& rhs)
+    : mData(rhs.release())
+{
+}
+
+template<class T>
+template<class S>
+linked_ptr<T>::linked_ptr(std::unique_ptr<S>&& rhs)
+    : mData(rhs.release())
+{
+}
+
+template<class T>
 void linked_ptr<T>::reset()
 {
     if (mNode.unique())
