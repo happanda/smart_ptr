@@ -68,7 +68,7 @@ void list_node::swap(list_node& rhs)
 struct custom_deleter_base
 {
     virtual ~custom_deleter_base() {}
-    virtual void destroy(void const* ptr) const = 0;
+    virtual void destroy(void* ptr) const = 0;
 };
 
 template<class T, class D>
@@ -79,9 +79,9 @@ struct custom_deleter : public custom_deleter_base
     {
     }
 
-    void destroy(void const* ptr) const
+    void destroy(void* ptr) const
     {
-        mDeleter(static_cast<T const*>(ptr));
+        mDeleter(static_cast<T*>(ptr));
     }
 
 private:
@@ -100,6 +100,7 @@ template<class T>
 linked_ptr<T>::linked_ptr(linked_ptr<T> const& rhs)
     : mData(rhs.mData)
     , mNode(rhs.mNode)
+    , mDeleter(rhs.mDeleter)
 {
 }
 
@@ -117,6 +118,7 @@ template<class T>
 linked_ptr<T>::linked_ptr(linked_ptr<T>&& rhs)
     : mData(rhs.mData)
     , mNode(rhs.mNode)
+    , mDeleter(rhs.mDeleter)
 {
     rhs.reset();
 }
@@ -149,6 +151,7 @@ template<class S>
 linked_ptr<T>::linked_ptr(linked_ptr<S> const& rhs)
     : mData(rhs.mData)
     , mNode(rhs.mNode)
+    , mDeleter(rhs.mDeleter)
 {
 }
 
@@ -179,9 +182,10 @@ linked_ptr<T>::linked_ptr(std::auto_ptr<S>&& rhs)
 }
 
 template<class T>
-template<class S>
-linked_ptr<T>::linked_ptr(std::unique_ptr<S>&& rhs)
+template<class S, class D>
+linked_ptr<T>::linked_ptr(std::unique_ptr<S, D>&& rhs)
     : mData(rhs.release())
+    , mDeleter(new custom_deleter<T, D>(rhs.get_deleter()))
 {
 }
 
@@ -194,8 +198,8 @@ linked_ptr<T> const& linked_ptr<T>::operator=(std::auto_ptr<S>&& rhs)
 }
 
 template<class T>
-template<class S>
-linked_ptr<T>const& linked_ptr<T>::operator=(std::unique_ptr<S>&& rhs)
+template<class S, class D>
+linked_ptr<T>const& linked_ptr<T>::operator=(std::unique_ptr<S, D>&& rhs)
 {
     this_type(std::move(rhs)).swap(*this);
     return *this;
@@ -206,17 +210,18 @@ void linked_ptr<T>::reset()
 {
     if (mNode.unique())
     {
-        if (!mDeleter)
-            delete mData;
-        else
+        if (mDeleter)
         {
-            mDeleter->destroy(static_cast<void const*>(mData));
+            mDeleter->destroy(static_cast<void*>(mData));
             delete mDeleter;
         }
+        else
+            delete mData;
     }
     else
         mNode.unlink();
     mData = nullptr;
+    mDeleter = nullptr;
 }
 
 template<class T>
