@@ -390,3 +390,15 @@ TEST_F(Linked_Ptr_General_Tests, FromStandard)
 
     cout << "Construction from standard smart pointers successful" << endl;
 }
+
+TEST_F(Linked_Ptr_General_Tests, MakeLinked)
+{
+    cout << "TEST make_linked" << endl;
+
+    linked_ptr<TestObject> linkedObj = make_linked<TestObject>(hello);
+    EXPECT_NE(nullptr, linkedObj.get()) << ERROR_INEQUALITY;
+    EXPECT_EQ(hello, linkedObj->msg) << ERROR_EQUALITY;
+    EXPECT_TRUE(linkedObj.unique()) << ERROR_NOT_UNIQUE;
+
+    cout << "make_linked successful" << endl;
+}

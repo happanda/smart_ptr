@@ -255,10 +255,40 @@ T* linked_ptr<T>::operator->()
 }
 
 template<class T>
+void linked_ptr<T>::swap(linked_ptr<T>& rhs)
+{
+    if (mData != rhs.mData)
+    {
+        std::swap(mData, rhs.mData);
+        mNode.swap(rhs.mNode);
+        std::swap(mDeleter, rhs.mDeleter);
+    }
+}
+
+template<class T>
 T const* linked_ptr<T>::operator->() const
 {
     return mData;
 }
+
+template<class T>
+void linked_ptr<T>::bool_test_function() const
+{
+}
+
+template<class T>
+linked_ptr<T>::operator bool_type() const
+{
+    return mData != nullptr ? &linked_ptr<T>::bool_test_function : nullptr;
+}
+
+
+template<class T, class... Args>
+linked_ptr<T> make_linked(Args&&... args)
+{
+    return linked_ptr<T>(new T(std::forward<Args>(args)...));
+}
+
 
 template<class T>
 bool operator==(linked_ptr<T> const& left, linked_ptr<T> const& right)
@@ -276,27 +306,6 @@ template<class T>
 bool operator<(linked_ptr<T> const& left, linked_ptr<T> const& right)
 {
     return left.get() < right.get();
-}
-
-template<class T>
-void linked_ptr<T>::bool_test_function() const
-{
-}
-
-template<class T>
-linked_ptr<T>::operator bool_type() const
-{
-    return mData != nullptr ? &linked_ptr<T>::bool_test_function : nullptr;
-}
-
-template<class T>
-void linked_ptr<T>::swap(linked_ptr<T>& rhs)
-{
-    if (mData != rhs.mData)
-    {
-        std::swap(mData, rhs.mData);
-        mNode.swap(rhs.mNode);
-    }
 }
 
 #endif

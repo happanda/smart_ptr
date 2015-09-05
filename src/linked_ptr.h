@@ -80,6 +80,11 @@ private:
     friend class linked_ptr;
 };
 
+
+template<class T, class... Args>
+linked_ptr<T> make_linked(Args&&... args);
+
+
 template<class T>
 bool operator==(const linked_ptr<T>& left, const linked_ptr<T>& right);
 template<class T>
