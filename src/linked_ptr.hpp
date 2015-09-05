@@ -57,12 +57,10 @@ void list_node::swap(list_node& rhs)
 {
     if (this == &rhs)
         return;
-    {
-        list_node thisCopy(*this);
-        list_node rhsCopy(rhs);
-        rhs = thisCopy;
-        *this = rhsCopy;
-    }
+    list_node thisCopy(*this);
+    list_node rhsCopy(rhs);
+    rhs = thisCopy;
+    *this = rhsCopy;
 }
 
 /*********************************************************/
@@ -111,6 +109,24 @@ linked_ptr<T> const& linked_ptr<T>::operator=(linked_ptr<T> const& rhs)
     if (mData != rhs.mData)
     {
         this_type(rhs).swap(*this);
+    }
+    return *this;
+}
+
+template<class T>
+linked_ptr<T>::linked_ptr(linked_ptr<T>&& rhs)
+    : mData(rhs.mData)
+    , mNode(rhs.mNode)
+{
+    rhs.reset();
+}
+
+template<class T>
+linked_ptr<T> const& linked_ptr<T>::operator=(linked_ptr<T>&& rhs)
+{
+    if (mData != rhs.mData)
+    {
+        this_type(std::move(rhs)).swap(*this);
     }
     return *this;
 }

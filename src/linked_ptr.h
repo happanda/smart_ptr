@@ -34,8 +34,13 @@ private:
 
 public:
     linked_ptr();
+
     linked_ptr(linked_ptr<T> const& rhs);
     linked_ptr<T> const& operator=(linked_ptr<T> const& rhs);
+
+    linked_ptr(linked_ptr<T>&& rhs);
+    linked_ptr<T> const& operator=(linked_ptr<T>&& rhs);
+
     ~linked_ptr();
 
     template<class S> linked_ptr(S* data);

@@ -402,3 +402,25 @@ TEST_F(Linked_Ptr_General_Tests, MakeLinked)
 
     cout << "make_linked successful" << endl;
 }
+
+TEST_F(Linked_Ptr_General_Tests, Move)
+{
+    cout << "TEST move construction and assignment" << endl;
+
+    linked_ptr<TestObject> linkedObj(new TestObject(hello));
+    EXPECT_NE(nullptr, linkedObj.get()) << ERROR_INEQUALITY;
+
+    linked_ptr<TestObject> linkedObjMoved(std::move(linkedObj));
+    EXPECT_EQ(nullptr, linkedObj.get()) << ERROR_EQUALITY;
+    EXPECT_NE(nullptr, linkedObjMoved.get()) << ERROR_INEQUALITY;
+    EXPECT_TRUE(linkedObjMoved.unique()) << ERROR_NOT_UNIQUE;
+    EXPECT_EQ(hello, linkedObjMoved->msg) << ERROR_EQUALITY;
+
+    linkedObj = std::move(linkedObjMoved);
+    EXPECT_EQ(nullptr, linkedObjMoved.get()) << ERROR_EQUALITY;
+    EXPECT_NE(nullptr, linkedObj.get()) << ERROR_INEQUALITY;
+    EXPECT_TRUE(linkedObj.unique()) << ERROR_NOT_UNIQUE;
+    EXPECT_EQ(hello, linkedObj->msg) << ERROR_EQUALITY;
+
+    cout << "Move successful" << endl;
+}
