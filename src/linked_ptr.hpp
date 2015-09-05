@@ -169,6 +169,22 @@ linked_ptr<T>::linked_ptr(std::unique_ptr<S>&& rhs)
 }
 
 template<class T>
+template<class S>
+linked_ptr<T> const& linked_ptr<T>::operator=(std::auto_ptr<S>&& rhs)
+{
+    this_type(std::move(rhs)).swap(*this);
+    return *this;
+}
+
+template<class T>
+template<class S>
+linked_ptr<T>const& linked_ptr<T>::operator=(std::unique_ptr<S>&& rhs)
+{
+    this_type(std::move(rhs)).swap(*this);
+    return *this;
+}
+
+template<class T>
 void linked_ptr<T>::reset()
 {
     if (mNode.unique())

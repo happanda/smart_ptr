@@ -334,5 +334,59 @@ TEST_F(Linked_Ptr_General_Tests, FromStandard)
         EXPECT_EQ(to, linkedObj.get()) << ERROR_EQUALITY;
     }
 
+    {
+        cout << "Assign from auto_ptr" << endl;
+        std::auto_ptr<TestObject> autoObj(new TestObject(hello));
+        TestObject* to = autoObj.get();
+        linked_ptr<TestObject> linkedObj;
+        linkedObj = std::move(autoObj);
+
+        EXPECT_EQ(nullptr, autoObj.get()) << ERROR_EQUALITY;
+        EXPECT_EQ(to, linkedObj.get()) << ERROR_EQUALITY;
+    }
+
+    {
+        cout << "Assign from unique_ptr" << endl;
+        std::unique_ptr<TestObject> uniObj(new TestObject(hello));
+        TestObject* to = uniObj.get();
+        linked_ptr<TestObject> linkedObj;
+        linkedObj = std::move(uniObj);
+
+        EXPECT_EQ(nullptr, uniObj.get()) << ERROR_EQUALITY;
+        EXPECT_EQ(to, linkedObj.get()) << ERROR_EQUALITY;
+    }
+
+    {
+        cout << "Assign from auto_ptr while not empty" << endl;
+        std::auto_ptr<TestObject> autoObj(new TestObject(hello));
+        TestObject* to = autoObj.get();
+        linked_ptr<TestObject> linkedObj(new TestObject(goodbye));
+        linked_ptr<TestObject> linkedObjCopy(linkedObj);
+        linkedObj = std::move(autoObj);
+
+        EXPECT_EQ(nullptr, autoObj.get()) << ERROR_EQUALITY;
+        EXPECT_EQ(to, linkedObj.get()) << ERROR_EQUALITY;
+        EXPECT_EQ(hello, linkedObj->msg) << ERROR_EQUALITY;
+        EXPECT_EQ(goodbye, linkedObjCopy->msg) << ERROR_EQUALITY;
+        EXPECT_TRUE(linkedObj.unique()) << ERROR_NOT_UNIQUE;
+        EXPECT_TRUE(linkedObjCopy.unique()) << ERROR_NOT_UNIQUE;
+    }
+
+    {
+        cout << "Assign from unique_ptr while not empty" << endl;
+        std::unique_ptr<TestObject> uniObj(new TestObject(hello));
+        TestObject* to = uniObj.get();
+        linked_ptr<TestObject> linkedObj(new TestObject(goodbye));
+        linked_ptr<TestObject> linkedObjCopy(linkedObj);
+        linkedObj = std::move(uniObj);
+
+        EXPECT_EQ(nullptr, uniObj.get()) << ERROR_EQUALITY;
+        EXPECT_EQ(to, linkedObj.get()) << ERROR_EQUALITY;
+        EXPECT_EQ(hello, linkedObj->msg) << ERROR_EQUALITY;
+        EXPECT_EQ(goodbye, linkedObjCopy->msg) << ERROR_EQUALITY;
+        EXPECT_TRUE(linkedObj.unique()) << ERROR_NOT_UNIQUE;
+        EXPECT_TRUE(linkedObjCopy.unique()) << ERROR_NOT_UNIQUE;
+    }
+
     cout << "Construction from standard smart pointers successful" << endl;
 }

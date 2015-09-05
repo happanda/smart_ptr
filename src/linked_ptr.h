@@ -46,6 +46,9 @@ public:
     template<class S> linked_ptr(std::auto_ptr<S>&& rhs);
     template<class S> linked_ptr(std::unique_ptr<S>&& rhs);
 
+    template<class S> linked_ptr const& operator=(std::auto_ptr<S>&& rhs);
+    template<class S> linked_ptr const& operator=(std::unique_ptr<S>&& rhs);
+
     void reset();
     void reset(T* data);
 
