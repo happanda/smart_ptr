@@ -51,6 +51,8 @@ public:
 
     void reset();
     void reset(T* data);
+    template<class D>
+    void reset(T* data, D d);
 
     T* get();
     T const* get() const;

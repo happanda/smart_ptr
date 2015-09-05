@@ -69,6 +69,7 @@ void list_node::swap(list_node& rhs)
 /*                      deleter                          */
 struct custom_deleter_base
 {
+    virtual ~custom_deleter_base() {}
     virtual void destroy(void const* ptr) const = 0;
 };
 
@@ -192,7 +193,10 @@ void linked_ptr<T>::reset()
         if (!mDeleter)
             delete mData;
         else
+        {
             mDeleter->destroy(static_cast<void const*>(mData));
+            delete mDeleter;
+        }
     }
     else
         mNode.unlink();
@@ -204,6 +208,14 @@ void linked_ptr<T>::reset(T* data)
 {
     reset();
     mData = data;
+}
+
+template<class T>
+template<class D>
+void linked_ptr<T>::reset(T* data, D d)
+{
+    reset(data);
+    mDeleter = new custom_deleter<D>(d);
 }
 
 template<class T>
