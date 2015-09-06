@@ -230,6 +230,7 @@ TEST_F(Linked_Ptr_General_Tests, Some_load)
         p_to_array[i].reset();
     }
     EXPECT_TRUE(p_to.unique()) << ERROR_NOT_UNIQUE;
+    delete[] p_to_array;
     cout << "Mass copying/wiping pointers successful" << endl;
 }
 
