@@ -53,6 +53,24 @@ bool list_node::unique() const
     return (prev == nullptr && next == nullptr);
 }
 
+long list_node::use_count() const
+{
+    long count{ 1 };
+    list_node* it{ prev };
+    while (it != nullptr)
+    {
+        it = it->prev;
+        ++count;
+    }
+    it = next;
+    while (it != nullptr)
+    {
+        it = it->next;
+        ++count;
+    }
+    return count;
+}
+
 void list_node::swap(list_node& rhs)
 {
     if (this == &rhs)
@@ -255,6 +273,14 @@ template<class T>
 bool linked_ptr<T>::unique() const
 {
     return mNode.unique();
+}
+
+template<class T>
+long linked_ptr<T>::use_count() const
+{
+    if (!mData)
+        return 0;
+    return mNode.use_count();
 }
 
 template<class T>

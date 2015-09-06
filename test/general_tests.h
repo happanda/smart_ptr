@@ -13,6 +13,7 @@ protected:
     static std::string const ERROR_ASSIGN;
     static std::string const ERROR_UNIQUE;
     static std::string const ERROR_NOT_UNIQUE;
+    static std::string const ERROR_USE_COUNT;
     static std::string const ERROR_FUNC;
     static std::string const ERROR_EQUALITY;
     static std::string const ERROR_INEQUALITY;
@@ -56,6 +57,7 @@ std::string const Linked_Ptr_General_Tests::ERROR_COPY{ "Error copying pointer!!
 std::string const Linked_Ptr_General_Tests::ERROR_ASSIGN{ "Error assigning pointer!!\n" };
 std::string const Linked_Ptr_General_Tests::ERROR_UNIQUE{ "Error: pointer is unique!!\n" };
 std::string const Linked_Ptr_General_Tests::ERROR_NOT_UNIQUE{ "Error: pointer is NOT unique!!\n" };
+std::string const Linked_Ptr_General_Tests::ERROR_USE_COUNT{ "Error: use_count is wrong!!\n" };
 std::string const Linked_Ptr_General_Tests::ERROR_FUNC{ "Error in fucntion!!\n" };
 std::string const Linked_Ptr_General_Tests::ERROR_EQUALITY{ "Error with equality!!\n" };
 std::string const Linked_Ptr_General_Tests::ERROR_INEQUALITY{ "Error with INequality!!\n" };
@@ -213,7 +215,7 @@ TEST_F(Linked_Ptr_General_Tests, Some_load)
     cout << "TEST mass copying/wiping pointers" << endl;
     EXPECT_TRUE(p_to.unique()) << ERROR_NOT_UNIQUE;
     linked_ptr<TestObject>* p_to_array = new linked_ptr<TestObject>[MAX_ITERATIONS];
-    for (int i = 0; i < MAX_ITERATIONS; i++)
+    for (int i = 0; i < MAX_ITERATIONS; ++i)
     {
         linked_ptr<TestObject> p_to_copy1(p_to);
         linked_ptr<TestObject> p_to_copy2 = p_to;
@@ -224,13 +226,20 @@ TEST_F(Linked_Ptr_General_Tests, Some_load)
         p_to_array[i] = p_to;
     }
     cout << "Cycle of repeated copying and wiping pointers is successfull" << endl;
-    for (int i = MAX_ITERATIONS - 1; i >= 0; i--)
+    for (int i = MAX_ITERATIONS - 1; i >= 0; --i)
     {
         EXPECT_FALSE(p_to.unique()) << ERROR_UNIQUE;
+        EXPECT_EQ(i + 2, p_to.use_count()) << ERROR_USE_COUNT;
         p_to_array[i].reset();
     }
-    EXPECT_TRUE(p_to.unique()) << ERROR_NOT_UNIQUE;
     delete[] p_to_array;
+
+    EXPECT_TRUE(p_to.unique()) << ERROR_NOT_UNIQUE;
+    EXPECT_EQ(1, p_to.use_count()) << ERROR_USE_COUNT;
+
+    linked_ptr<TestObject> emptyPtr;
+    EXPECT_EQ(0, emptyPtr.use_count()) << ERROR_USE_COUNT;
+
     cout << "Mass copying/wiping pointers successful" << endl;
 }
 

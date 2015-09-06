@@ -14,11 +14,13 @@ struct list_node
 
     void unlink();
     bool unique() const;
+        // care!! Complexity is linear of the count
+    long use_count() const;
 
     void swap(list_node& rhs);
 
 private:
-    //links to next and previous ptrs in list
+        //links to next and previous ptrs in list
     list_node* next{ nullptr };
     list_node* prev{ nullptr };
 };
@@ -63,6 +65,7 @@ public:
     T const* get() const;
 
     bool unique() const;
+    long use_count() const;
 
     T& operator*();
     T const& operator*() const;
